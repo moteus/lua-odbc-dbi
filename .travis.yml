@@ -1,0 +1,44 @@
+language: c
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - unixodbc
+      - unixodbc-dev
+      - libmyodbc
+
+services:
+  - mysql
+
+env:
+  matrix:
+    - LUA="lua 5.1"
+    # - LUA="lua 5.2"
+    # - LUA="lua 5.3"
+    # - LUA="luajit 2.0"
+    # - LUA="luajit 2.1"
+
+before_install:
+  - pip install --user hererocks
+  - hererocks here -r^ --$LUA
+  - export PATH=$PATH:$PWD/here/bin
+
+install:
+  - luarocks make rockspec/luadbi-odbc-scm-0.rockspec
+
+before_script:
+  # install test framewarks
+  - luarocks install busted
+  - luarocks install luacov-coveralls
+  # install ODBC Driver and DSN
+  - cp ./spec/configs/.odbcinst.ini $HOME
+  - odbcinst -i -s -h -f ./spec/configs/mytest.odbc.ini
+  # Configure MySQL
+  - mysql -u root -e "create database IF NOT EXISTS test"
+  - mysql -u root -e "create user 'luadbi'@'localhost' IDENTIFIED BY 'testing12345!!!'"
+  - mysql -u root -D test < ./spec/schemas/mysql.sql
+
+script:
+  - busted

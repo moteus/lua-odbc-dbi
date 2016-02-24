@@ -3,6 +3,8 @@
 return { -- MySQL
 	connect = {
 		name = 'MySQL-test',
+		user = 'luadbi',
+		pass = 'testing12345!!!',
 	},
 
 	encoding_test = {
