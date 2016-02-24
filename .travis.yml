@@ -44,4 +44,4 @@ script:
   - busted --coverage --verbose
 
 after_success:
-  - luacov-coveralls -v -e $TRAVIS_BUILD_DIR/lua_install
+  - luacov-coveralls -v -i src -e src/DBI
