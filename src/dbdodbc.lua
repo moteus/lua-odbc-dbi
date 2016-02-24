@@ -10,7 +10,7 @@ local DBD_ODBC_STATEMENT  = "DBD.ODBC.Statement"
 local Connection, Statement
 
 local function odbc_error(err)
-  return tostring(err)
+  return err and tostring(err) or nil
 end
 
 local function odbc_return(ok, ...)
@@ -108,6 +108,10 @@ end
 
 function Statement:execute(...)
   assert(self._stmt:prepared())
+
+  if not self._stmt:closed() then
+    self._stmt:close()
+  end
 
   self._rows_affected = nil
 

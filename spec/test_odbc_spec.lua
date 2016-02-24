@@ -122,6 +122,93 @@ local function test_select()
 	sth:close()
 end
 
+local function test_fetch_named()
+	local sth, err = dbh:prepare(code('select'))
+	local success
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+	success, err = sth:execute("Row 1")
+
+	assert.is_true(success)
+	assert.is_nil(err)
+
+	local row, err = sth:fetch(true)
+	assert.is_nil(err)
+
+	if config.have_booleans then
+		assert.is_true(row['flag'])
+	else
+		assert.equals(1, row['flag'])
+	end
+
+	assert.equals('Row 1', row['name'])
+	assert.is_number(row['maths'])
+
+	local row, err = sth:fetch(true)
+	assert.is_nil(row)
+	assert.is_nil(err)
+
+	sth:close()
+end
+
+local function test_fetch_indexed()
+	local sth, err = dbh:prepare(code('select'))
+	local success
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+	success, err = sth:execute("Row 1")
+
+	assert.is_true(success)
+	assert.is_nil(err)
+
+	local row, err = sth:fetch(false)
+	assert.is_nil(err)
+
+	if config.have_booleans then
+		assert.is_true(row[3])
+	else
+		assert.equals(1, row[3])
+	end
+
+	assert.equals('Row 1', row[2])
+	assert.is_number(row[4])
+
+	local row, err = sth:fetch(false)
+	assert.is_nil(row)
+	assert.is_nil(err)
+
+	sth:close()
+end
+
+local function test_execute_twice()
+	local sth, err = dbh:prepare(code('select'))
+	local success
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+	success, err = sth:execute("Row 1")
+
+	assert.is_true(success)
+	assert.is_nil(err)
+
+	local row, err = sth:fetch(true)
+	assert.is_nil(err)
+	assert.equals('Row 1', row['name'])
+
+	success, err = sth:execute("Row 2")
+
+	assert.is_true(success)
+	assert.is_nil(err)
+
+	local row, err = sth:fetch(true)
+	assert.is_nil(err)
+	assert.equals('Row 2', row['name'])
+
+	sth:close()
+end
+
 local function test_select_multi()
 	local sth, err = dbh:prepare(code('select_multi'))
 	local count = 0
@@ -233,6 +320,19 @@ local function test_insert_returning()
 	assert.are_equal(stringy, row[2])
 end
 
+local function test_close()
+	local sth, err = dbh:prepare(code('select'))
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+
+	assert.is_true(sth:close())
+	assert.is_true(sth:close())
+
+	assert.is_true(dbh:close())
+	assert.is_true(dbh:close())
+end
+
 --
 -- Prove affected() is functional.
 --
@@ -323,14 +423,19 @@ describe("ODBC", function()
 	db_type = "ODBC"
 	config = dofile("spec/configs/" .. db_type .. ".lua")
 
-	setup(setup_tests)
+	before_each(setup_tests)
+	after_each(teardown)
+
 	it( "Tests login failure", connection_fail )
 	it( "Tests syntax error", syntax_error )
 	it( "Tests value encoding", test_encoding )
 	it( "Tests a simple select", test_select )
+	it( "Tests fetch named", test_fetch_named )
+	it( "Tests fetch indexed", test_fetch_indexed )
 	it( "Tests multi-row selects", test_select_multi )
+	it( "Tests execute twice", test_execute_twice )
 	-- it( "Tests inserts", test_insert_returning )
 	it( "Tests no insert_id", test_no_insert_id )
 	it( "Tests affected rows", test_update )
-	teardown(teardown)
+	it( "Tests close", test_close )
 end)
