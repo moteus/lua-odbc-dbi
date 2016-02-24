@@ -29,7 +29,6 @@ local function setup_tests()
 		config.connect.port
 	)
 
-	print(dbh)
 	assert.is_nil(err)
 	assert.is_not_nil(dbh)
 	assert.is_not_nil(dbh:autocommit( true ))

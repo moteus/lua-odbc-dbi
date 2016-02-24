@@ -41,4 +41,7 @@ before_script:
   - mysql -u root -D test < ./spec/schemas/mysql.sql
 
 script:
-  - busted
+  - busted --coverage --verbose
+
+after_success:
+  - luacov-coveralls -v -e $TRAVIS_BUILD_DIR/lua_install
