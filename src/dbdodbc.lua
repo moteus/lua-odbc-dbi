@@ -54,7 +54,7 @@ function Connection:autocommit(turn_on)
   return odbc_return(self._cnn:setautocommit(turn_on))
 end
 
-function Connection:close(turn_on)
+function Connection:close()
   if self._cnn then
     local env = self._cnn:environment()
     self._cnn:destroy()
