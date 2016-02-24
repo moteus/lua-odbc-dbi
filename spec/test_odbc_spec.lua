@@ -333,6 +333,16 @@ local function test_close()
 	assert.is_true(dbh:close())
 end
 
+local function test_tostring()
+	local sth, err = dbh:prepare(code('select'))
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+
+	assert.match("DBD%." .. db_type .."%.Connection", tostring(dbh))
+	assert.match("DBD%." .. db_type .."%.Statement",  tostring(sth))
+end
+
 --
 -- Prove affected() is functional.
 --
@@ -438,4 +448,5 @@ describe("ODBC", function()
 	it( "Tests no insert_id", test_no_insert_id )
 	it( "Tests affected rows", test_update )
 	it( "Tests close", test_close )
+	it( "Tests tostring", test_tostring )
 end)
