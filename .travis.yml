@@ -32,6 +32,7 @@ before_script:
   # install test framewarks
   - luarocks install busted
   - luarocks install luacov-coveralls
+  - luarocks install luacheck
   # install ODBC Driver and DSN
   - cp ./spec/configs/.odbcinst.ini $HOME
   - odbcinst -i -s -h -f ./spec/configs/mytest.odbc.ini
@@ -42,6 +43,7 @@ before_script:
 
 script:
   - busted --coverage --verbose
+  - luacheck src/dbdodbc.lua
 
 after_success:
   - luacov-coveralls -v -i src -e src/DBI
