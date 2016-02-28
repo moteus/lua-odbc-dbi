@@ -78,7 +78,7 @@ function Connection:prepare(sql)
   return Statement_new(ok)
 end
 
-function Connection:quote(sql)
+function Connection:quote(sql) -- luacheck: ignore
   error("Not implemented")
 end
 
@@ -152,7 +152,7 @@ end
 function Statement:rows(named_columns)
   local res, fetch_mode = {}, named_columns and "a" or "n"
   return function ()
-    local res, err = self._stmt:fetch(res, fetch_mode)
+    local err res, err = self._stmt:fetch(res, fetch_mode)
     if res then return res end
     if err then error(tostring(err)) end
   end
