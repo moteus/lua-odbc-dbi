@@ -344,6 +344,24 @@ local function test_tostring()
 end
 
 --
+-- Prove something sane happens in the event that the database
+-- handle goes away, but statements are still open.
+--
+local function test_db_close_doesnt_segfault()
+	local sth, err = dbh:prepare("SELECT 1");
+
+	assert.is_nil(err)
+	assert.is_not_nil(sth)
+
+	dbh:close()
+	dbh = nil
+
+	assert.has_error(function()
+		sth:execute()
+	end)
+end
+
+--
 -- Prove affected() is functional.
 --
 local function test_update()
@@ -414,17 +432,16 @@ local function test_no_insert_id()
 	local sth, sth2, err, success, stringy
 	local stringy = os.date()
 
-
 	sth, err = dbh:prepare(code('insert'))
 	
 	assert.is_nil(err)
 	assert.is_not_nil(sth)
 	success, err = sth:execute(stringy)
-	
+
 	assert.has_error(function()
 		local x = dbh:insert_id()
 	end)
-	
+
 	sth:close()
 
 end
@@ -449,4 +466,5 @@ describe("ODBC", function()
 	it( "Tests affected rows", test_update )
 	it( "Tests close", test_close )
 	it( "Tests tostring", test_tostring )
+	it( "Tests closing dbh doesn't segfault", test_db_close_doesnt_segfault )
 end)
