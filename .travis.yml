@@ -46,4 +46,4 @@ script:
   - luacheck src/dbd/odbc.lua
 
 after_success:
-  - luacov-coveralls -v -i src -e src/DBI
+  - luacov-coveralls -v -i src
