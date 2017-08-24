@@ -14,7 +14,7 @@ description = {
 
 dependencies = {
   "lua >= 5.1, < 5.4",
-  -- "DBI",
+  -- "luadbi > 0.5",
   "odbc",
 }
 
@@ -23,8 +23,8 @@ build = {
   copy_directories = {"spec"},
 
   modules = {
-    [ "DBI"     ] = "src/DBI.lua",
-    [ "dbdodbc" ] = "src/dbdodbc.lua",
+    [ "DBI"      ] = "src/DBI.lua",
+    [ "dbd.odbc" ] = "src/dbd/odbc.lua",
   }
 }
 

@@ -43,7 +43,7 @@ before_script:
 
 script:
   - busted --coverage --verbose
-  - luacheck src/dbdodbc.lua
+  - luacheck src/dbd/odbc.lua
 
 after_success:
   - luacov-coveralls -v -i src -e src/DBI
